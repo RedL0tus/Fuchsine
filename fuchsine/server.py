@@ -54,6 +54,8 @@ class Server(bottle.Bottle):
             return bottle.static_file(file_path, root=self.config['DEFAULT']['root'], download=str(file_path))
         else:
             if os.path.isdir(real_path):
+                if not file_path.endswith("/"):
+                    bottle.redirect(file_path + "/")
                 # Initialize response
                 source = dict()
                 source['type'] = path_type
