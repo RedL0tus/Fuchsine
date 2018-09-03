@@ -1,7 +1,7 @@
 This is a {{ source.type }}!
 
 <ul>
-    {% for file in source.files %}
-        <li><a href="./{{ file }}">{{ file }}</a></li>
+    {% for filename, value in source.files.items() %}
+        <li><a href="./{{ filename }}">{{ filename }}</a> Type: {{ value['type'] }}</li>
     {% endfor %}
 </ul>

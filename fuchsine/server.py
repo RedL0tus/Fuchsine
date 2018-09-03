@@ -26,6 +26,15 @@ def get_path_type(path):
     else:
         return PathType.Directory
 
+def generate_file_dict(path):
+    """Generate a dictionary of files and directories in the given path"""
+    file_dict = dict()
+    orig_list = os.listdir(path)
+    for item in orig_list:
+        file_dict[item] = dict()
+        file_dict[item]['type'] = get_path_type(str(path) + str(item))
+    return file_dict
+
 def generate_http_response(body=None, status=None, headers=None):
     """Generate proper HTTP response"""
     headers = headers or dict()
@@ -40,10 +49,20 @@ class Server(bottle.Bottle):
         self.config = config
         # Routes
         self.route('/', callback=self.redirect_to_files)
-        self.route('/files/', callback=self.serve_files)
-        self.route('/files/<file_path:path>', callback=self.serve_files)
+        self.route('/files', callback=self.redirect_to_files)
+        self.route('/files/', callback=self.route_files)
+        self.route('/files/<file_path:path>', callback=self.route_files)
+    
+    def render_index(self, path_type, real_path):
+        """Render indexes"""
+        # Initialize response
+        source = dict()
+        source['type'] = path_type
+        source['files'] = generate_file_dict(real_path)
+        # Render and return response
+        return generate_http_response(body=render_page(self.config['DEFAULT']['template'] + "/index.html", source))
 
-    def serve_files(self, file_path=None):
+    def route_files(self, file_path=None):
         """Serve the files"""
         # Get real path
         file_path = file_path or ""
@@ -54,14 +73,9 @@ class Server(bottle.Bottle):
             return bottle.static_file(file_path, root=self.config['DEFAULT']['root'], download=str(file_path))
         else:
             if os.path.isdir(real_path):
-                if not file_path.endswith("/"):
+                if (not file_path.endswith("/")) and (file_path != ""):
                     bottle.redirect(file_path + "/")
-                # Initialize response
-                source = dict()
-                source['type'] = path_type
-                source['files'] = os.listdir(real_path)
-                # Render and return response
-                return generate_http_response(body=render_page(self.config['DEFAULT']['template'] + "/index.html", source))
+                return self.render_index(path_type, real_path)
             else:
                 return bottle.abort(404, "File not found")
         return bottle.abort(500, "Unknown server error")
