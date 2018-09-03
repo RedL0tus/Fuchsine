@@ -31,35 +31,26 @@ class Server(bottle.Bottle):
         super(Server, self).__init__()
         self.config = config
         self.route('/', callback=self.redirect_to_files)
-        self.route('/files/<filepath:path>', callback=self.serve_files)
-        self.route('/files/', callback=self.serve_root)
+        self.route('/files/', callback=self.serve_files)
+        self.route('/files/<file_path:path>', callback=self.serve_files)
 
-    def serve_files(self, filepath):
-        path_type = get_path_type(self.config['DEFAULT']['root'] + "/" + filepath)
+    def serve_files(self, file_path=None):
+        file_path = file_path or ""
+        real_path = self.config['DEFAULT']['root'] + "/" + str(file_path)
+        path_type = get_path_type(real_path)
         source = dict()
         source['type'] = path_type
         if path_type == PathType.File:
-            return bottle.static_file(filepath, root=self.config['DEFAULT']['root'], download=filepath)
+            return bottle.static_file(file_path, root=self.config['DEFAULT']['root'], download=str(file_path))
         else:
-            if os.path.isdir(self.config['DEFAULT']['root'] + "/" + filepath):
-                source['files'] = os.listdir(self.config['DEFAULT']['root'] + "/" + filepath)
+            if os.path.isdir(real_path):
+                source['files'] = os.listdir(real_path)
             else:
-                return generate_http_response(body="<html><body><p>404 Not Found</p></body></html>", status=404)
-        return generate_http_response(body=render_index(self.config['DEFAULT']['template'] + "/index.html", source))
-
-    def serve_root(self):
-        source = dict()
-        source['type'] = get_path_type(self.config['DEFAULT']['root'])
-        if os.path.isdir(self.config['DEFAULT']['root']):
-            source['files'] = os.listdir(self.config['DEFAULT']['root'])
-        else:
-            return generate_http_response(body="<html><body><p>404 Not Found<br />(root directory not found)</p></body></html>", status=404)
-        return generate_http_response(body=render_index(self.config['DEFAULT']['template'] + "/index.html", source))
+                return bottle.abort(404, "File not found")
+        return generate_http_response(body=render_page(self.config['DEFAULT']['template'] + "/index.html", source))
 
     def redirect_to_files(self):
-        headers = dict()
-        headers['Location'] = "files/"
-        return generate_http_response(status=302, headers=headers)
+        bottle.redirect('files/')
 
 def start(config):
     server = Server(config)

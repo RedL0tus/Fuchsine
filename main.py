@@ -7,7 +7,6 @@ import fuchsine.server as server
 import fuchsine.config as config_util
 
 if __name__ == '__main__':
-    #server.start()
     parser = argparse.ArgumentParser()
     parser.add_argument("action", help="Action to take")
     parser.add_argument("-c", "--config", help="Annotate config file")
