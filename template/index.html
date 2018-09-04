@@ -1,7 +1,64 @@
-This is a {{ source.type }}!
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <meta name="renderer" content="webkit">
+        <title>Index of /{{ source.path }}</title>
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdui/0.4.1/css/mdui.min.css" integrity="sha256-lCFxSSYsY5OMx6y8gp8/j6NVngvBh3ulMtrf4SX5Z5A=" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mdui/0.4.1/js/mdui.min.js" integrity="sha256-dZxrLDxoyEQADIAGrWhPtWqjDFvZZBigzArprSzkKgI=" crossorigin="anonymous"></script>
+        <link href="{{ source.base_url + '/assets/css/style.css' }}" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet"> 
+    </head>
+    <body class="mdui-drawer-body-left mdui-appbar-with-toolbar mdui-theme-primary-indigo mdui-theme-accent-pink">
+        <header class="mdui-appbar mdui-appbar-fixed">
+            <div class="mdui-toolbar mdui-color-theme">
+                <span class="mdui-btn mdui-btn-icon mdui-ripple mdui-ripple-white" mdui-drawer="{target: '#main-drawer', swipe: true}"><i class="mdui-icon material-icons">menu</i></span>
+                <a href="../" class="mdui-typo-headline mdui-hidden-xs">Index of /{{ source.path }}</a>
+                <div class="mdui-toolbar-spacer"></div>
+                </a>
+            </div>
+        </header>
+        <div class="mdui-drawer" id="main-drawer">
+            <div class="mdui-list" style="margin-bottom: 76px;">
+                <div class="mdui-list-item mdui-ripple">
+                    <i class="mdui-list-item-icon mdui-icon material-icons">&#xe88a;</i>
+                    <a href="{{ source.base_url }}" class="mdui-list-item-content">
+                        Go back to /
+                    </a>
+                </div>
+                {% if source.path != "/" %}
+                <div class="mdui-list-item mdui-ripple">
+                    <i class="mdui-list-item-icon mdui-icon material-icons">&#xe5d8;</i>
+                    <a href="../" class="mdui-list-item-content">
+                        Go to upper level
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="mdui-container">
+            {% if source.files != {} %}
+                <ul class="mdui-list">
+                    {% for filename, value in source.files.items() %}
+                        <li class="mdui-list-item mdui-ripple">
+                            {% if value['type'] == "Directory" %}
+                                <i class="mdui-list-item-icon mdui-icon material-icons">&#xe2c7;</i>
+                            {% else %}
+                                <i class="mdui-list-item-icon mdui-icon material-icons">&#xe24d;</i>
+                            {% endif %}
+                            <a href="./{{ filename }}" class="mdui-list-item-content">
+                                {{ filename }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Empty directory</p>
+            {% endif %}
+        </div>
+    </body>
+</html>
 
-<ul>
-    {% for filename, value in source.files.items() %}
-        <li><a href="./{{ filename }}">{{ filename }}</a> Type: {{ value['type'] }}</li>
-    {% endfor %}
-</ul>
