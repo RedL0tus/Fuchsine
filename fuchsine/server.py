@@ -73,7 +73,7 @@ class Server(bottle.Bottle):
         else:
             if os.path.isdir(real_path):
                 if (not file_path.endswith("/")) and (file_path != ""):
-                    bottle.redirect("/files/" + file_path + "/")
+                    bottle.redirect(self.config['DEFAULT']['base_url'] + '/files/' + file_path + '/')
                 return self.render_index(file_path, path_type, real_path)
             else:
                 return bottle.abort(404, "File not found")
@@ -84,7 +84,7 @@ class Server(bottle.Bottle):
 
     def redirect_to_files(self):
         """Redirect to subdirectory 'files/'"""
-        bottle.redirect('files/')
+        bottle.redirect(self.config['DEFAULT']['base_url'] + '/files/')
 
 def start(config):
     """Start the service"""
