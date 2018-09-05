@@ -72,11 +72,16 @@ class Server(bottle.Bottle):
                     .relative_to(pathlib.PurePath( \
                         self.config["DEFAULT"]['root'])))
                 real_path = self.config['DEFAULT']['root'] + file_path
-                new_index[file_path] = dict()
-                new_index[file_path]['type'] = get_path_type(real_path)
-                new_index[file_path]['mtime'] = os.path.getmtime(real_path)
-                if self.config['DEFAULT']['file_size']:
-                    new_index[file_path]['size'] = os.path.getsize(real_path)
+                try:
+                    new_index[file_path] = dict()
+                    new_index[file_path]['type'] = get_path_type(real_path)
+                    new_index[file_path]['mtime'] = os.path.getmtime(real_path)
+                    if self.config['DEFAULT']['file_size']:
+                        new_index[file_path]['size'] = os.path.getsize(real_path)
+                except FileNotFoundError:
+                    print("Found one missing file: " + real_path)
+                except OSError:
+                    print("Error while creating index for: " + real_path)
         self.index = new_index
         print("Done.")
     
