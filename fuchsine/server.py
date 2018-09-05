@@ -69,8 +69,8 @@ class Server(bottle.Bottle):
         for path, subdirs, files in os.walk(self.config['DEFAULT']['root'], followlinks=True):
             for name in (files + subdirs):
                 file_path = "/" + str(pathlib.PurePath(path, name) \
-                    .relative_to(*pathlib.PurePath( \
-                        self.config["DEFAULT"]['root']).parts[:1]))
+                    .relative_to(pathlib.PurePath( \
+                        self.config["DEFAULT"]['root'])))
                 real_path = self.config['DEFAULT']['root'] + file_path
                 new_index[file_path] = dict()
                 new_index[file_path]['type'] = get_path_type(real_path)
