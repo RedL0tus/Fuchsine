@@ -9,7 +9,7 @@
         <meta http-equiv="Cache-Control" content="no-siteapp"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdui/0.4.1/css/mdui.min.css" integrity="sha256-lCFxSSYsY5OMx6y8gp8/j6NVngvBh3ulMtrf4SX5Z5A=" crossorigin="anonymous" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mdui/0.4.1/js/mdui.min.js" integrity="sha256-dZxrLDxoyEQADIAGrWhPtWqjDFvZZBigzArprSzkKgI=" crossorigin="anonymous"></script>
-        <link href="{{ source.config.base_url + '/assets/css/style.css' }}" rel="stylesheet">
+        <link href="{{ source.config.base_url + '/fuchsine/assets/css/style.css' }}" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Roboto+Mono" rel="stylesheet"> 
     </head>
     <body class="mdui-drawer-body-left mdui-appbar-with-toolbar mdui-theme-primary-indigo mdui-theme-accent-pink">
@@ -49,7 +49,7 @@
                             {% else %}
                                 <i class="mdui-list-item-icon mdui-icon material-icons">&#xe24d;</i>
                             {% endif %}
-                            <a href="./{{ filename }}" class="mdui-list-item-content">
+                            <a href="./{{ filename }}{% if value['type'] == "Directory" %}/{%endif%}" class="mdui-list-item-content">
                                 {{ filename }}
                             </a>
                         </li>

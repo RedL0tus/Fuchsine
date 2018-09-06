@@ -39,11 +39,8 @@ class Server(bottle.Bottle):
         self.index = dict()
         self.build_index()
         # Routes
-        self.route('/', callback=self.redirect_to_files)
-        self.route('/files', callback=self.redirect_to_files)
-        self.route('/files/', callback=self.route_files)
-        self.route('/files/<file_path:path>', callback=self.route_files)
-        self.route('/assets/<file_path:path>', callback=self.serve_assets)
+        self.route('/', callback=self.route_files)
+        self.route('/<file_path:path>', callback=self.route_files)
 
     class FileChangeHandler(FileSystemEventHandler):
         def __init__(self, outer):
@@ -101,8 +98,10 @@ class Server(bottle.Bottle):
 
     def route_files(self, file_path=None):
         """Serve the files"""
-        # Get real path
         file_path = file_path or ""
+        if file_path.startswith("fuchsine/"):
+            return self.serve_assets(file_path[9:])
+        # Get real path
         real_path = self.config['DEFAULT']['root'] + "/" + str(file_path)
         # Get that kind of path it is
         path_type = get_path_type(real_path)
@@ -111,18 +110,14 @@ class Server(bottle.Bottle):
         else:
             if os.path.isdir(real_path):
                 if (not file_path.endswith("/")) and (file_path != ""):
-                    bottle.redirect(self.config['DEFAULT']['base_url'] + '/files/' + file_path + '/')
+                    bottle.redirect(self.config['DEFAULT']['base_url'] + '/' + file_path + '/')
                 return self.render_index(file_path)
             else:
                 return bottle.abort(404, "File not found")
         return bottle.abort(500, "Unknown server error")
 
     def serve_assets(self, file_path):
-        return bottle.static_file(file_path, root=self.config['DEFAULT']['template'] + "/assets")
-
-    def redirect_to_files(self):
-        """Redirect to subdirectory 'files/'"""
-        bottle.redirect(self.config['DEFAULT']['base_url'] + '/files/')
+        return bottle.static_file(file_path, root=self.config['DEFAULT']['template'])
 
     def rocknroll(self):
         handler = self.FileChangeHandler(self)
