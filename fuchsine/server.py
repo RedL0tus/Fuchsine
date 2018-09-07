@@ -115,6 +115,12 @@ class Server(bottle.Bottle):
                 path_found = True
                 if path.startswith(file_path) and ("/" not in path[len(file_path):]):
                     source['files'][path[len(file_path):]] = self.index[path]
+        # Custom banner
+        if "fuchsine.banner.html" in source['files']:
+            source['has_banner'] = True
+            del source['files']['fuchsine.banner.html']
+        else:
+            source['has_banner'] = False
         if path_found:
             # Render and return response
             return generate_http_response(body=render_page(self.config['DEFAULT']['template'] + "/index.html", source))
