@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
-#-*- encoding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 
 """
 Fuchsine main service
 """
 
 import os
-import time
-import bottle
 import pathlib
 import threading
+import time
+
+import bottle
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
 from . import __version__
 from .template import *
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+
 
 def get_path_type(path):
     """Determine what type of path it is"""
@@ -23,12 +25,14 @@ def get_path_type(path):
     else:
         return "Directory"
 
+
 def generate_http_response(body=None, status=None, headers=None):
     """Generate proper HTTP response"""
     headers = headers or dict()
     headers['Date'] = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime())
     headers['Server'] = "Fuchsine/" + __version__
     return bottle.HTTPResponse(body, status, **headers)
+
 
 class Server(bottle.Bottle):
     """Fuchsine server main object (Bottle)"""
@@ -47,6 +51,7 @@ class Server(bottle.Bottle):
 
     class FileChangeHandler(FileSystemEventHandler):
         """Just like its name"""
+
         def __init__(self, outer):
             # Pass outer object inside
             self.upper = outer
@@ -59,6 +64,7 @@ class Server(bottle.Bottle):
 
     class FileChangeListener(threading.Thread):
         """Second thread that listen to file system change"""
+
         def __init__(self, outer, handler):
             threading.Thread.__init__(self)
             # Pass outer object and handler inside
@@ -82,7 +88,7 @@ class Server(bottle.Bottle):
                 # Get relative path
                 file_path = "/" + str(pathlib.PurePath(path, name) \
                     .relative_to(pathlib.PurePath( \
-                        self.config["DEFAULT"]['root'])))
+                    self.config["DEFAULT"]['root'])))
                 # Get real path
                 real_path = self.config['DEFAULT']['root'] + file_path
                 # Catch frequent errors
@@ -100,7 +106,7 @@ class Server(bottle.Bottle):
         # Replace index
         self.index = new_index
         print("Done.")
-    
+
     def render_index(self, file_path):
         """Render indexes"""
         # Initialize response
@@ -156,6 +162,7 @@ class Server(bottle.Bottle):
         listener = self.FileChangeListener(self, handler)
         listener.start()
         self.run(host=self.config['DEFAULT']['host'], port=self.config['DEFAULT']['port'])
+
 
 def start(config):
     """Start the service"""

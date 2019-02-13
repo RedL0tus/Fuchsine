@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#-*- encoding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 
 """
 Fuchsine command line helper
@@ -13,8 +13,8 @@ $ python3 fuchsined.py -c config.ini start
 
 import argparse
 
-import fuchsine.server as server
 import fuchsine.config as config_util
+import fuchsine.server as server
 
 if __name__ == '__main__':
     # Parse command line arguments
